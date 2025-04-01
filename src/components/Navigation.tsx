@@ -1,5 +1,6 @@
 import { RefreshCw, Settings } from 'lucide-react';
-import { Logo } from './Logo';
+// import { Logo } from './Logo';
+import Logo from '../../public/githubba.svg'
 
 interface NavigationProps {
   onSettingsClick: () => void;
@@ -17,7 +18,8 @@ export function Navigation(props: NavigationProps) {
           href='https://githubba.vercel.app/'
           className='flex items-center gap-2 text-white/70 hover:text-white transition-colors'
         >
-          <Logo className='size-8' />
+          {/* <Logo className='size-8' /> */}
+          <img src={Logo} alt="" className='size-8' />
           <span className='text-base font-medium'>githubba</span>
         </a>
 
