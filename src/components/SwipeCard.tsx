@@ -7,7 +7,7 @@ import useWindowSize from '../hooks/use-window-size';
 import React, { ReactNode } from 'react';
 
 const settings = {
-  maxTilt: 25, // in deg
+  maxTilt: 10, // in deg
   rotationPower: 50,
   swipeThreshold: 0.5 // need to update this threshold for RN (1.5 seems reasonable...?)
 }
