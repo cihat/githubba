@@ -31,6 +31,7 @@ export function RepositoryList(props: RepositoryListProps) {
     } else if (dir === 'right') {
       console.log('swiped right');
       console.log('repo >>', repo);
+      window.open(repo.html_url, '_blank', 'noopener,noreferrer');
       
       setAnimation({ type: 'like', show: true });
       
