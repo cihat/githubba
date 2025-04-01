@@ -18,7 +18,7 @@ export function Navigation(props: NavigationProps) {
           className='flex items-center gap-2 text-white/70 hover:text-white transition-colors'
         >
           <Logo className='size-8' />
-          <span className='text-base font-medium'>gitkot</span>
+          <span className='text-base font-medium'>githubba</span>
         </a>
 
         <div className='flex items-center gap-2'>
