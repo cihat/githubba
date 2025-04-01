@@ -1,3 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-nocheck
+
 // Copyed from https://www.npmjs.com/package/react-tinder-card
 import  { useSpring, animated } from '@react-spring/web';
 import useWindowSize from '../hooks/use-window-size';
