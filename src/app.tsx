@@ -10,6 +10,7 @@ import { useGitHub } from './hooks/use-github';
 import { useInfiniteScroll } from './hooks/use-infinite-scroll';
 import { useOnlineStatus } from './hooks/use-online-status';
 import { FeedType } from './lib/github';
+import { Analytics } from '@vercel/analytics/react';
 
 export function App() {
   const [showSettings, setShowSettings] = useState(false);
@@ -107,6 +108,7 @@ export function App() {
           scrollContainerRef={scrollContainerRef}
         />
       )}
+      <Analytics />
     </div>
   );
 }
