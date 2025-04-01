@@ -1,5 +1,15 @@
 {
- "name": "App",
+ "name": "Githubba",
+  "short_name": "Githubba",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "description": "Githubba is a web application that allows you to search for Github repositories and users.",
+  "lang": "en-US",
+  "dir": "ltr",
+  "orientation": "portrait",
+  "scope": "/",
  "icons": [
   {
    "src": "\/android-icon-36x36.png",
