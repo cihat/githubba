@@ -1,4 +1,4 @@
-import { RefreshCw, Settings } from 'lucide-react';
+import { Github, RefreshCw, Settings } from 'lucide-react';
 // import { Logo } from './Logo';
 import Logo from '../../public/githubba.svg'
 
@@ -24,6 +24,9 @@ export function Navigation(props: NavigationProps) {
         </a>
 
         <div className='flex items-center gap-2'>
+          <a href='https://github.com/cihat/githubba' target='_blank'>
+            <Github className='w-5 h-5 text-white/70 hover:text-white transition-colors' />
+          </a>
           <button
             onClick={onSettingsClick}
             className='p-2 text-white/70 hover:text-white transition-colors'
