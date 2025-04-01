@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="./public/icon-512.png" alt="githubba" width="100" height="100">
+  <img src="./public/githubba.png" alt="githubba" width="300" height="300">
   <h1>githubba.vercel.app</h1>
   <p>Tinder but to explore GitHub repositories</p>
   <p align="center">
