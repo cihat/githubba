@@ -10,32 +10,31 @@ interface NavigationProps {
 
 export function Navigation(props: NavigationProps) {
   const { onSettingsClick, onRefreshClick, isDataLoading } = props;
-
+  
   return (
-    <nav className='px-4 sm:px-6 py-4 flex justify-between flex-row bg-white/5 backdrop-blur-xl border-b border-white/10 z-50'>
+    <nav className='px-4 sm:px-6 py-4 flex justify-between flex-row bg-gray-50 dark:bg-white/5 backdrop-blur-xl border-b border-gray-200 dark:border-white/10 z-50'>
       <div className='flex-1 flex justify-between max-w-2xl mx-auto items-center gap-2'>
         <a
           href='https://githubba.vercel.app/'
-          className='flex items-center gap-2 text-white/70 hover:text-white transition-colors'
+          className='flex items-center gap-2 text-gray-700 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors'
         >
           {/* <Logo className='size-8' /> */}
           <img src={Logo} alt="" className='size-8' />
           <span className='text-base font-medium'>githubba</span>
         </a>
-
         <div className='flex items-center gap-2'>
           <a href='https://github.com/cihat/githubba' target='_blank'>
-            <Github className='w-5 h-5 text-white/70 hover:text-white transition-colors' />
+            <Github className='w-5 h-5 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors' />
           </a>
           <button
             onClick={onSettingsClick}
-            className='p-2 text-white/70 hover:text-white transition-colors'
+            className='p-2 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors'
           >
             <Settings className='w-5 h-5' />
           </button>
           <button
             onClick={onRefreshClick}
-            className='p-2 text-white/70 hover:text-white transition-colors'
+            className='p-2 text-gray-600 dark:text-white/70 hover:text-gray-900 dark:hover:text-white transition-colors'
             disabled={isDataLoading}
           >
             <RefreshCw className={`w-5 h-5 ${isDataLoading ? 'animate-spin' : ''}`} />

@@ -75,7 +75,7 @@ export function App() {
   };
 
   return (
-    <div className='h-screen relative flex flex-col bg-gradient-to-b from-zinc-900 to-black text-white overflow-hidden'>
+    <div className='h-screen relative flex flex-col bg-white dark:bg-zinc-900 dark:bg-gradient-to-b dark:from-zinc-900 dark:to-black text-zinc-900 dark:text-white overflow-hidden'>
       {(isFetchingMore || isLoading || isRefetching) && <LoadingBar />}
 
       {showSettings && (
@@ -108,6 +108,7 @@ export function App() {
           scrollContainerRef={scrollContainerRef}
         />
       )}
+
       <Analytics />
     </div>
   );
