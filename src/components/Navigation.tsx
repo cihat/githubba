@@ -14,7 +14,7 @@ export function Navigation(props: NavigationProps) {
     <nav className='px-4 sm:px-6 py-4 flex justify-between flex-row bg-white/5 backdrop-blur-xl border-b border-white/10 z-50'>
       <div className='flex-1 flex justify-between max-w-2xl mx-auto items-center gap-2'>
         <a
-          href='https://gitkot.com'
+          href='https://githubba.vercel.app/'
           className='flex items-center gap-2 text-white/70 hover:text-white transition-colors'
         >
           <Logo className='size-8' />

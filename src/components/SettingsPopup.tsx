@@ -196,7 +196,7 @@ export function SettingsPopup(props: SettingsPopupProps) {
               <p className='mt-2 text-sm text-white/50'>
                 Add a GitHub token to avoid rate limiting. You can{' '}
                 <a
-                  href='https://github.com/settings/tokens/new?description=gitkot&scopes=public_repo'
+                  href='https://github.com/settings/tokens/new?description=githubba&scopes=public_repo'
                   target='_blank'
                   rel='noopener noreferrer'
                   className='text-blue-400 hover:text-blue-300 transition-colors'
