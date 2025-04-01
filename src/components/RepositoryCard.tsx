@@ -194,6 +194,10 @@ export function RepositoryCard({ repository }: RepositoryCardProps) {
         <a
           href={repository.html_url}
           target='_blank'
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(repository.html_url, '_blank');
+          }}
           className='flex-1 bg-white/5 dark:bg-white/[0.05] text-gray-900 dark:text-white py-3 sm:p-4 rounded-lg sm:rounded-xl 
             font-medium text-sm sm:text-base hover:bg-gray-300 dark:hover:bg-white/[0.08] transition-all 
             flex items-center justify-center gap-1 sm:gap-2 border border-gray-300 dark:border-white/[0.1] 
