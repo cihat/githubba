@@ -11,37 +11,44 @@ interface RepositoryListProps {
 export function RepositoryList(props: RepositoryListProps) {
   const { repositories, scrollContainerRef } = props;
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [animation, setAnimation] = useState<{ type: 'like' | 'dislike' | null, show: boolean }>({ 
-    type: null, 
-    show: false 
+  const [animation, setAnimation] = useState<{ type: 'like' | 'dislike' | null, show: boolean }>({
+    type: null,
+    show: false
   });
-  
+
   const onSwipe = (dir: string, repo: Repository, index: number) => {
     if (dir === 'left') {
       console.log('swiped left');
       console.log('repo >>', repo);
-      
+
       setAnimation({ type: 'dislike', show: true });
-      
+
       setTimeout(() => {
         setAnimation({ type: null, show: false });
         setCurrentIndex(index + 1);
-      }, 800);
-      
+      }, 500);
+
     } else if (dir === 'right') {
       console.log('swiped right');
       console.log('repo >>', repo);
+
+      //! fix this later
+      // if(window.innerWidth < 768) {
+      //   window.location.href = repo.html_url;
+      // } else {
+      //   window.open(repo.html_url, '_blank', 'noopener,noreferrer');
+      // }
+
       window.open(repo.html_url, '_blank', 'noopener,noreferrer');
-      
       setAnimation({ type: 'like', show: true });
-      
+
       setTimeout(() => {
         setAnimation({ type: null, show: false });
         setCurrentIndex(index + 1);
-      }, 800);
+      }, 500);
     }
   }
-  
+
   useEffect(() => {
     if (scrollContainerRef.current && currentIndex < repositories.length) {
       const nextCard = document.getElementById(`repo-card-${currentIndex}`);
@@ -69,7 +76,7 @@ export function RepositoryList(props: RepositoryListProps) {
           )}
         </div>
       )}
-      
+
       <div className="flex flex-col items-center">
         {repositories.map((repository, index) => (
           <SwipeCard
