@@ -59,7 +59,7 @@ export function SettingsPopup(props: SettingsPopupProps) {
 
   return (
     <div
-      className='fixed inset-0 flex items-center justify-center bg-black/30 dark:bg-black/30 bg-gray-500/30 backdrop-blur-md z-50'
+      className='fixed inset-0 flex items-center justify-center bg-black/30 dark:bg-black/30  backdrop-blur-md z-50'
       onClick={onClose}
     >
       <div
@@ -71,7 +71,7 @@ export function SettingsPopup(props: SettingsPopupProps) {
       >
         {/* Header */}
         <div className='px-6 py-4 border-b border-gray-200 dark:border-white/10 flex justify-between items-center'>
-          <h2 className='text-xl font-semibold text-gray-900 dark:text-white dark:bg-gradient-to-br dark:from-white dark:to-white/70 dark:text-transparent dark:bg-clip-text'>
+          <h2 className='text-xl font-semibold text-gray-900 dark:bg-gradient-to-br dark:from-white dark:to-white/70 dark:text-transparent dark:bg-clip-text'>
             Settings
           </h2>
           <button
