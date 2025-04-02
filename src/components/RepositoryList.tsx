@@ -2,6 +2,7 @@ import { RefObject, useEffect, useState, useCallback } from 'react';
 import { Repository, RepositoryCard } from './RepositoryCard';
 import SwipeCard from './SwipeCard';
 import { Heart, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { openLink } from '../lib/utils';
 
 interface RepositoryListProps {
   repositories: Repository[];
@@ -42,7 +43,7 @@ export function RepositoryList({ repositories, scrollContainerRef }: RepositoryL
 
   useEffect(() => {
     if (!scrollContainerRef.current || currentIndex >= repositories.length) return;
-    
+
     const nextCard = document.getElementById(`repo-card-${currentIndex}`);
     if (nextCard) {
       nextCard.scrollIntoView({ behavior: 'instant' });
@@ -53,7 +54,7 @@ export function RepositoryList({ repositories, scrollContainerRef }: RepositoryL
     if (!swipeHint.show) return;
 
     const currentStep = ANIMATION_SEQUENCE[swipeHint.sequenceIndex];
-    
+
     setSwipeHint(prev => ({
       ...prev,
       direction: currentStep.direction as 'left' | 'right' | null
@@ -81,21 +82,22 @@ export function RepositoryList({ repositories, scrollContainerRef }: RepositoryL
 
   const handleLeftSwipe = (repository: Repository, index: number) => {
     console.log('Swiped left on repository:', repository.id);
-    
+
     showAnimationAndAdvance('dislike', index);
   };
 
   const handleRightSwipe = (repository: Repository, index: number) => {
     console.log('Swiped right on repository:', repository.id);
-    
-    window.open(repository.html_url, '_blank', 'noopener,noreferrer');
-    
+
+    openLink(repository.html_url);
+
     showAnimationAndAdvance('like', index);
   };
 
+
   const showAnimationAndAdvance = (type: 'like' | 'dislike', index: number) => {
     setAnimation({ type, show: true });
-    
+
     window.setTimeout(() => {
       setAnimation({ type: null, show: false });
       setCurrentIndex(index + 1);
@@ -117,7 +119,7 @@ export function RepositoryList({ repositories, scrollContainerRef }: RepositoryL
     >
       <AnimationOverlay animation={animation} />
       <SwipeDirectionIndicators show={swipeHint.show} direction={swipeHint.direction} />
-      <RepositoryCardList 
+      <RepositoryCardList
         repositories={repositories}
         currentIndex={currentIndex}
         swipeHint={swipeHint}
@@ -134,7 +136,7 @@ interface AnimationOverlayProps {
 
 function AnimationOverlay({ animation }: AnimationOverlayProps) {
   if (!animation.show) return null;
-  
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
       {animation.type === 'like' ? (
@@ -157,7 +159,7 @@ interface SwipeDirectionIndicatorsProps {
 
 function SwipeDirectionIndicators({ show, direction }: SwipeDirectionIndicatorsProps) {
   if (!show) return null;
-  
+
   return (
     <>
       {/* Left Arrow */}
@@ -185,12 +187,12 @@ interface RepositoryCardListProps {
   getHintClassName: (index: number) => string;
 }
 
-function RepositoryCardList({ 
-  repositories, 
-  currentIndex, 
-  swipeHint, 
-  handleSwipe, 
-  getHintClassName 
+function RepositoryCardList({
+  repositories,
+  currentIndex,
+  swipeHint,
+  handleSwipe,
+  getHintClassName
 }: RepositoryCardListProps) {
   return (
     <div className="flex flex-col items-center">
