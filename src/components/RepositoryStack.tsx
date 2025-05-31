@@ -113,13 +113,13 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     setSwipeHint({ show: false, direction: null, sequenceIndex: 0 });
 
     if (direction === 'left') {
-      handleLeftSwipe(repository, index);
+      handleLeftSwipe(repository);
     } else if (direction === 'right') {
-      handleRightSwipe(repository, index);
+      handleRightSwipe(repository);
     }
   }, [currentIndex]);
 
-  const handleLeftSwipe = useCallback((repository: Repository, index: number) => {
+  const handleLeftSwipe = useCallback((repository: Repository) => {
     console.log('Swiped left on repository:', repository.id);
 
     triggerAnimation('dislike', () => {
@@ -127,7 +127,7 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     });
   }, [triggerAnimation, advanceToNextCard]);
 
-  const handleRightSwipe = useCallback((repository: Repository, index: number) => {
+  const handleRightSwipe = useCallback((repository: Repository) => {
     console.log('Swiped right on repository:', repository.id);
 
     openLink(repository.html_url);
