@@ -7,7 +7,7 @@ import { openLink } from '../lib/utils';
 interface RepositoryListProps {
   repositories: Repository[];
   scrollContainerRef: RefObject<HTMLDivElement | null>;
-  onLoadMore?: () => void; // Callback for loading more repositories
+  onLoadMore?: () => void;
 }
 
 interface AnimationState {
@@ -28,7 +28,7 @@ const ANIMATION_SEQUENCE = [
   { direction: null, duration: 1000 }
 ];
 
-const ANIMATION_DURATION = 500;
+const ANIMATION_DURATION = 800; // Increased duration for better visibility
 const CARD_TRANSITION_DURATION = 400;
 
 export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }: RepositoryListProps) {
@@ -76,7 +76,6 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     };
   }, [swipeHint.show, swipeHint.sequenceIndex]);
 
-  // Check if we need to load more repositories
   useEffect(() => {
     const remainingCards = repositories.length - currentIndex;
     const shouldLoadMore = remainingCards <= 5 && !hasRequestedMore && onLoadMore;
@@ -87,13 +86,10 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     }
   }, [currentIndex, repositories.length, hasRequestedMore, onLoadMore]);
 
-  // Reset the request flag when new repositories are added (but only if significantly more added)
   useEffect(() => {
-    // Only reset if we got significantly more repositories (indicates successful fetch)
     if (repositories.length > prevLengthRef.current + 5) {
       setHasRequestedMore(false);
     }
-
     prevLengthRef.current = repositories.length;
   }, [repositories.length]);
 
@@ -112,7 +108,6 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
   }, []);
 
   const triggerAnimation = useCallback((type: 'like' | 'dislike', onComplete?: () => void) => {
-    // Clear any existing animation timer
     if (animationTimerRef.current) {
       window.clearTimeout(animationTimerRef.current);
     }
@@ -131,11 +126,9 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
 
     setIsTransitioning(true);
 
-    // Shorter delay for smoother experience
     transitionTimerRef.current = window.setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
 
-      // Allow a brief moment for the new card to settle
       setTimeout(() => {
         setIsTransitioning(false);
       }, 100);
@@ -145,7 +138,6 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
   }, [currentIndex, repositories.length]);
 
   const handleSwipe = useCallback((direction: string, repository: Repository, index: number) => {
-    // Only handle swipes for the current card
     if (index !== currentIndex) return;
 
     setSwipeHint({ show: false, direction: null, sequenceIndex: 0 });
@@ -183,10 +175,8 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     return '';
   }, [swipeHint.show, swipeHint.direction, currentIndex]);
 
-  // Get visible cards (current and next few with enhanced stacking)
-  // Memoize this to prevent unnecessary recalculations
   const visibleCards = useMemo(() => {
-    const visibleCount = 3; // Show current + 3 behind for better depth
+    const visibleCount = 3;
     return repositories.slice(currentIndex, currentIndex + visibleCount);
   }, [repositories, currentIndex]);
 
@@ -235,17 +225,21 @@ function AnimationOverlay({ animation }: AnimationOverlayProps) {
   const animationConfig = {
     like: {
       icon: Heart,
-      size: 120,
+      size: 140,
       color: "#FF4B91",
       fillColor: "#FF4B91",
-      strokeWidth: 1.5
+      strokeWidth: 1.5,
+      bgColor: "rgba(255, 75, 145, 0.15)",
+      shadowColor: "rgba(255, 75, 145, 0.4)"
     },
     dislike: {
       icon: X,
-      size: 120,
+      size: 140,
       color: "#FF4B4B",
       fillColor: "none",
-      strokeWidth: 3
+      strokeWidth: 3,
+      bgColor: "rgba(255, 75, 75, 0.15)",
+      shadowColor: "rgba(255, 75, 75, 0.4)"
     }
   };
 
@@ -254,14 +248,96 @@ function AnimationOverlay({ animation }: AnimationOverlayProps) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-      <div className="animate-pulse scale-in-center">
-        <IconComponent
-          size={config.size}
-          color={config.color}
-          fill={config.fillColor}
-          strokeWidth={config.strokeWidth}
+      {/* Background overlay with fade in/out */}
+      <div
+        className="absolute inset-0 transition-opacity duration-300"
+        style={{
+          background: `radial-gradient(circle at center, ${config.bgColor} 0%, transparent 70%)`
+        }}
+      />
+
+      {/* Main animation container */}
+      <div className="relative flex items-center justify-center">
+        {/* Pulsing background circle */}
+        <div
+          className="absolute w-32 h-32 rounded-full animate-ping opacity-30"
+          style={{
+            backgroundColor: config.color,
+            animationDuration: '0.8s'
+          }}
         />
+
+        {/* Glowing ring effect */}
+        <div
+          className="absolute w-40 h-40 rounded-full animate-pulse"
+          style={{
+            border: `3px solid ${config.color}`,
+            boxShadow: `0 0 30px ${config.shadowColor}, inset 0 0 30px ${config.shadowColor}`,
+            animationDuration: '1s'
+          }}
+        />
+
+        {/* Main icon with enhanced animations */}
+        <div className="relative z-10 transform animate-bounce">
+          <div className="relative">
+            {/* Icon shadow/glow */}
+            <div
+              className="absolute inset-0 blur-sm opacity-50"
+              style={{
+                filter: `drop-shadow(0 0 20px ${config.shadowColor})`
+              }}
+            >
+              <IconComponent
+                size={config.size}
+                color={config.color}
+                fill={config.fillColor}
+                strokeWidth={config.strokeWidth}
+              />
+            </div>
+
+            {/* Main icon */}
+            <div className="relative animate-pulse">
+              <IconComponent
+                size={config.size}
+                color={config.color}
+                fill={config.fillColor}
+                strokeWidth={config.strokeWidth}
+                style={{
+                  filter: `drop-shadow(0 4px 15px ${config.shadowColor})`,
+                  transform: 'scale(1)',
+                  animation: 'heartbeat 0.8s ease-in-out'
+                }}
+              />
+            </div>
+          </div>
+        </div>
       </div>
+
+      {/* Additional CSS for custom animations */}
+      <style jsx>{`
+        @keyframes heartbeat {
+          0% { transform: scale(1); }
+          25% { transform: scale(1.2); }
+          50% { transform: scale(1); }
+          75% { transform: scale(1.1); }
+          100% { transform: scale(1); }
+        }
+        
+        .animate-bounce {
+          animation: bounce 0.8s infinite;
+        }
+        
+        @keyframes bounce {
+          0%, 100% { 
+            transform: translateY(0) scale(1);
+            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+          }
+          50% { 
+            transform: translateY(-15px) scale(1.05);
+            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+          }
+        }
+      `}</style>
     </div>
   );
 }
@@ -323,24 +399,21 @@ const CardStack = memo(function CardStack({
   getHintClassName,
   isTransitioning
 }: CardStackProps) {
+  console.log('aliveli');
   return (
+
     <div className="relative h-full flex items-center">
       {cards.map((repository, stackIndex) => {
         const actualIndex = currentIndex + stackIndex;
         const isTopCard = stackIndex === 0;
         const zIndex = cards.length - stackIndex;
 
-        // Enhanced card positioning and effects
         const scale = Math.max(0.85, 1 - (stackIndex * 0.08));
         const yOffset = stackIndex * 12;
         const xOffset = stackIndex * 4;
-        const opacity = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.2)); // Increased opacity for background cards
+        const opacity = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.2));
+        const brightness = isTopCard ? 1 : Math.max(0.75, 1 - (stackIndex * 0.12));
 
-        // Improved blur and brightness values
-        // const blur = stackIndex > 0 ? Math.min(stackIndex * 1.5, 10) : null; // Maximum 6px blur
-        const brightness = isTopCard ? 1 : Math.max(0.75, 1 - (stackIndex * 0.12)); // Top card full brightness, background cards less dimmed
-
-        // Enhanced transition classes
         const transitionClass = isTransitioning && isTopCard
           ? 'transition-all duration-500 ease-out'
           : 'transition-all duration-700 ease-out';
@@ -363,25 +436,22 @@ const CardStack = memo(function CardStack({
               onSwipe={(dir: string) => handleSwipe(dir, repository, actualIndex)}
             >
               <div className={`w-full h-[calc(100vh-120px)] relative ${getHintClassName(actualIndex)}`}>
-                {/* Card shadow overlay for depth - only for background cards */}
                 {stackIndex > 0 && (
                   <div
                     className="absolute inset-0 bg-black rounded-xl pointer-events-none z-10"
                     style={{
-                      opacity: Math.min(stackIndex * 0.08, 0.3), // Lighter shadow
-                      backdropFilter: `blur(${Math.min(stackIndex * 0.5, 2)}px)` // Less backdrop blur
+                      opacity: Math.min(stackIndex * 0.08, 0.3),
+                      backdropFilter: `blur(${Math.min(stackIndex * 0.5, 2)}px)`
                     }}
                   />
                 )}
 
-                {/* Additional readability enhancement for top card */}
                 {isTopCard && (
                   <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30 rounded-xl pointer-events-none z-5" />
                 )}
 
                 <RepositoryCard repository={repository} />
 
-                {/* Swipe Instruction Text - only on top card */}
                 {isTopCard && swipeHint.show && (
                   <div className="absolute inset-x-0 bottom-8 flex justify-center pointer-events-none z-20">
                     <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/30">
@@ -397,7 +467,6 @@ const CardStack = memo(function CardStack({
         );
       })}
 
-      {/* Background gradient for enhanced depth - lighter */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/3 rounded-xl" />
       </div>
