@@ -4,7 +4,7 @@ import { LoadingBar } from './components/LoadingBar';
 import { LoadingIndicator } from './components/LoadingIndicator';
 import { Navigation } from './components/Navigation';
 import { OfflineState } from './components/OfflineState';
-import { RepositoryList } from './components/RepositoryList';
+import { RepositoryStack } from './components/RepositoryStack';
 import { SettingsPopup } from './components/SettingsPopup';
 import { useGitHub } from './hooks/use-github';
 import { useOnlineStatus } from './hooks/use-online-status';
@@ -110,7 +110,7 @@ export function App() {
       ) : error ? (
         <ErrorState error={error.toString()} />
       ) : (
-        <RepositoryList
+        <RepositoryStack
           repositories={repositories}
           scrollContainerRef={scrollContainerRef}
           onLoadMore={handleLoadMore}

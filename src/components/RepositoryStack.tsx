@@ -36,7 +36,7 @@ interface RepositoryListProps {
   onLoadMore?: () => void; // Callback for loading more repositories
 }
 
-export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }: RepositoryListProps) {
+export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }: RepositoryListProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animation, setAnimation] = useState<AnimationState>({
     type: null,
@@ -281,7 +281,7 @@ function SwipeDirectionIndicators({ show, direction }: SwipeDirectionIndicatorsP
     left: {
       component: ChevronLeft,
       position: "left-4",
-      active: direction === 'left'
+      active: direction === 'left',
     },
     right: {
       component: ChevronRight,
@@ -337,9 +337,11 @@ function CardStack({
         const scale = Math.max(0.85, 1 - (stackIndex * 0.08));
         const yOffset = stackIndex * 12;
         const xOffset = stackIndex * 4;
-        const opacity = Math.max(0.3, 1 - (stackIndex * 0.25));
-        const blur = stackIndex > 0 ? stackIndex * 2 : 0;
-        const brightness = Math.max(0.7, 1 - (stackIndex * 0.1));
+        const opacity = isTopCard ? 1 : Math.max(0.3, 1 - (stackIndex * 0.25));
+
+        // İyileştirilmiş blur ve brightness değerleri
+        const blur = stackIndex > 0 ? Math.min(stackIndex * 1.5, 6) : 0; // Maksimum 6px blur
+        const brightness = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.15)); // Üst kart tam parlaklık
 
         // Enhanced transition classes
         const transitionClass = isTransitioning && isTopCard
@@ -364,15 +366,20 @@ function CardStack({
               onSwipe={(dir: string) => handleSwipe(dir, repository, actualIndex)}
             >
               <div className={`w-full h-[calc(100vh-120px)] relative ${getHintClassName(actualIndex)}`}>
-                {/* Card shadow overlay for depth */}
+                {/* Card shadow overlay for depth - sadece arka kartlar için */}
                 {stackIndex > 0 && (
                   <div
                     className="absolute inset-0 bg-black rounded-xl pointer-events-none z-10"
                     style={{
-                      opacity: stackIndex * 0.15,
-                      backdropFilter: `blur(${stackIndex}px)`
+                      opacity: Math.min(stackIndex * 0.12, 0.4), // Daha hafif gölge
+                      backdropFilter: `blur(${Math.min(stackIndex * 0.5, 2)}px)` // Daha az backdrop blur
                     }}
                   />
+                )}
+
+                {/* En üst kart için ek okunabilirlik iyileştirmesi */}
+                {isTopCard && (
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 rounded-xl pointer-events-none z-5" />
                 )}
 
                 <RepositoryCard repository={repository} />
@@ -380,8 +387,8 @@ function CardStack({
                 {/* Swipe Instruction Text - only on top card */}
                 {isTopCard && swipeHint.show && (
                   <div className="absolute inset-x-0 bottom-8 flex justify-center pointer-events-none z-20">
-                    <div className="bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/20">
-                      <p className="text-center text-gray-700 text-sm font-medium">
+                    <div className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/30">
+                      <p className="text-center text-gray-800 text-sm font-semibold drop-shadow-sm">
                         Swipe card left or right
                       </p>
                     </div>
@@ -393,9 +400,9 @@ function CardStack({
         );
       })}
 
-      {/* Background gradient for enhanced depth */}
+      {/* Background gradient for enhanced depth - daha hafif */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 rounded-xl" />
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/3 rounded-xl" />
       </div>
     </div>
   );
