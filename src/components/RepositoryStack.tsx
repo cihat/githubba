@@ -1,4 +1,4 @@
-import { RefObject, useEffect, useState, useCallback, useRef } from 'react';
+import { RefObject, useEffect, useState, useCallback, useRef, useMemo, memo } from 'react';
 import { Repository, RepositoryCard } from './RepositoryCard';
 import SwipeCard from './SwipeCard';
 import { Heart, X, ChevronLeft, ChevronRight } from 'lucide-react';
@@ -7,6 +7,7 @@ import { openLink } from '../lib/utils';
 interface RepositoryListProps {
   repositories: Repository[];
   scrollContainerRef: RefObject<HTMLDivElement | null>;
+  onLoadMore?: () => void; // Callback for loading more repositories
 }
 
 interface AnimationState {
@@ -29,12 +30,6 @@ const ANIMATION_SEQUENCE = [
 
 const ANIMATION_DURATION = 500;
 const CARD_TRANSITION_DURATION = 400;
-
-interface RepositoryListProps {
-  repositories: Repository[];
-  scrollContainerRef: RefObject<HTMLDivElement | null>;
-  onLoadMore?: () => void; // Callback for loading more repositories
-}
 
 export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }: RepositoryListProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -101,6 +96,7 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
 
     prevLengthRef.current = repositories.length;
   }, [repositories.length]);
+
   useEffect(() => {
     return () => {
       if (animationTimerRef.current) {
@@ -188,10 +184,11 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
   }, [swipeHint.show, swipeHint.direction, currentIndex]);
 
   // Get visible cards (current and next few with enhanced stacking)
-  const getVisibleCards = () => {
-    const visibleCount = 4; // Show current + 3 behind for better depth
+  // Memoize this to prevent unnecessary recalculations
+  const visibleCards = useMemo(() => {
+    const visibleCount = 3; // Show current + 3 behind for better depth
     return repositories.slice(currentIndex, currentIndex + visibleCount);
-  };
+  }, [repositories, currentIndex]);
 
   if (currentIndex >= repositories.length) {
     return (
@@ -215,7 +212,7 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 h-full relative">
           <CardStack
-            cards={getVisibleCards()}
+            cards={visibleCards}
             currentIndex={currentIndex}
             swipeHint={swipeHint}
             handleSwipe={handleSwipe}
@@ -318,7 +315,7 @@ interface CardStackProps {
   isTransitioning: boolean;
 }
 
-function CardStack({
+const CardStack = memo(function CardStack({
   cards,
   currentIndex,
   swipeHint,
@@ -337,11 +334,11 @@ function CardStack({
         const scale = Math.max(0.85, 1 - (stackIndex * 0.08));
         const yOffset = stackIndex * 12;
         const xOffset = stackIndex * 4;
-        const opacity = isTopCard ? 1 : Math.max(0.3, 1 - (stackIndex * 0.25));
+        const opacity = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.2)); // Increased opacity for background cards
 
-        // İyileştirilmiş blur ve brightness değerleri
-        const blur = stackIndex > 0 ? Math.min(stackIndex * 1.5, 6) : 0; // Maksimum 6px blur
-        const brightness = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.15)); // Üst kart tam parlaklık
+        // Improved blur and brightness values
+        // const blur = stackIndex > 0 ? Math.min(stackIndex * 1.5, 10) : null; // Maximum 6px blur
+        const brightness = isTopCard ? 1 : Math.max(0.75, 1 - (stackIndex * 0.12)); // Top card full brightness, background cards less dimmed
 
         // Enhanced transition classes
         const transitionClass = isTransitioning && isTopCard
@@ -356,7 +353,7 @@ function CardStack({
               zIndex,
               transform: `translateY(${yOffset}px) translateX(${xOffset}px) scale(${scale})`,
               opacity: isTransitioning && isTopCard ? 0 : opacity,
-              filter: `blur(${blur}px) brightness(${brightness})`,
+              filter: `blur(-1px) brightness(${brightness})`,
               transformOrigin: 'center center',
             }}
           >
@@ -366,20 +363,20 @@ function CardStack({
               onSwipe={(dir: string) => handleSwipe(dir, repository, actualIndex)}
             >
               <div className={`w-full h-[calc(100vh-120px)] relative ${getHintClassName(actualIndex)}`}>
-                {/* Card shadow overlay for depth - sadece arka kartlar için */}
+                {/* Card shadow overlay for depth - only for background cards */}
                 {stackIndex > 0 && (
                   <div
                     className="absolute inset-0 bg-black rounded-xl pointer-events-none z-10"
                     style={{
-                      opacity: Math.min(stackIndex * 0.12, 0.4), // Daha hafif gölge
-                      backdropFilter: `blur(${Math.min(stackIndex * 0.5, 2)}px)` // Daha az backdrop blur
+                      opacity: Math.min(stackIndex * 0.08, 0.3), // Lighter shadow
+                      backdropFilter: `blur(${Math.min(stackIndex * 0.5, 2)}px)` // Less backdrop blur
                     }}
                   />
                 )}
 
-                {/* En üst kart için ek okunabilirlik iyileştirmesi */}
+                {/* Additional readability enhancement for top card */}
                 {isTopCard && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20 rounded-xl pointer-events-none z-5" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30 rounded-xl pointer-events-none z-5" />
                 )}
 
                 <RepositoryCard repository={repository} />
@@ -400,10 +397,10 @@ function CardStack({
         );
       })}
 
-      {/* Background gradient for enhanced depth - daha hafif */}
+      {/* Background gradient for enhanced depth - lighter */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/3 rounded-xl" />
       </div>
     </div>
   );
-}
+});
