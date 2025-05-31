@@ -28,7 +28,7 @@ const ANIMATION_SEQUENCE = [
 ];
 
 const ANIMATION_DURATION = 500;
-const CARD_TRANSITION_DURATION = 300;
+const CARD_TRANSITION_DURATION = 400;
 
 interface RepositoryListProps {
   repositories: Repository[];
@@ -85,7 +85,7 @@ export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }:
   useEffect(() => {
     const remainingCards = repositories.length - currentIndex;
     const shouldLoadMore = remainingCards <= 5 && !hasRequestedMore && onLoadMore;
-    
+
     if (shouldLoadMore) {
       setHasRequestedMore(true);
       onLoadMore();
@@ -98,7 +98,7 @@ export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }:
     if (repositories.length > prevLengthRef.current + 5) {
       setHasRequestedMore(false);
     }
-    
+
     prevLengthRef.current = repositories.length;
   }, [repositories.length]);
   useEffect(() => {
@@ -134,18 +134,24 @@ export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }:
     if (currentIndex >= repositories.length - 1) return;
 
     setIsTransitioning(true);
-    
+
+    // Shorter delay for smoother experience
     transitionTimerRef.current = window.setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
-      setIsTransitioning(false);
+
+      // Allow a brief moment for the new card to settle
+      setTimeout(() => {
+        setIsTransitioning(false);
+      }, 100);
+
       transitionTimerRef.current = null;
-    }, CARD_TRANSITION_DURATION);
+    }, 200);
   }, [currentIndex, repositories.length]);
 
   const handleSwipe = useCallback((direction: string, repository: Repository, index: number) => {
     // Only handle swipes for the current card
     if (index !== currentIndex) return;
-    
+
     setSwipeHint({ show: false, direction: null, sequenceIndex: 0 });
 
     if (direction === 'left') {
@@ -181,9 +187,9 @@ export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }:
     return '';
   }, [swipeHint.show, swipeHint.direction, currentIndex]);
 
-  // Get visible cards (current and next few)
+  // Get visible cards (current and next few with enhanced stacking)
   const getVisibleCards = () => {
-    const visibleCount = 3; // Show current + 2 behind
+    const visibleCount = 4; // Show current + 3 behind for better depth
     return repositories.slice(currentIndex, currentIndex + visibleCount);
   };
 
@@ -205,7 +211,7 @@ export function RepositoryList({ repositories, scrollContainerRef, onLoadMore }:
     >
       <AnimationOverlay animation={animation} />
       <SwipeDirectionIndicators show={swipeHint.show} direction={swipeHint.direction} />
-      
+
       <div className="absolute inset-0 flex items-center justify-center">
         <div className="w-full max-w-3xl mx-auto px-4 sm:px-6 h-full relative">
           <CardStack
@@ -326,20 +332,30 @@ function CardStack({
         const actualIndex = currentIndex + stackIndex;
         const isTopCard = stackIndex === 0;
         const zIndex = cards.length - stackIndex;
-        
-        // Calculate card positioning and scaling
-        const scale = 1 - (stackIndex * 0.05);
-        const yOffset = stackIndex * 8;
-        const opacity = 1 - (stackIndex * 0.3);
+
+        // Enhanced card positioning and effects
+        const scale = Math.max(0.85, 1 - (stackIndex * 0.08));
+        const yOffset = stackIndex * 12;
+        const xOffset = stackIndex * 4;
+        const opacity = Math.max(0.3, 1 - (stackIndex * 0.25));
+        const blur = stackIndex > 0 ? stackIndex * 2 : 0;
+        const brightness = Math.max(0.7, 1 - (stackIndex * 0.1));
+
+        // Enhanced transition classes
+        const transitionClass = isTransitioning && isTopCard
+          ? 'transition-all duration-500 ease-out'
+          : 'transition-all duration-700 ease-out';
 
         return (
           <div
             key={repository.id}
-            className="absolute inset-0 flex items-center transition-all duration-300 ease-out"
+            className={`absolute inset-0 flex items-center ${transitionClass}`}
             style={{
               zIndex,
-              transform: `translateY(${yOffset}px) scale(${scale})`,
+              transform: `translateY(${yOffset}px) translateX(${xOffset}px) scale(${scale})`,
               opacity: isTransitioning && isTopCard ? 0 : opacity,
+              filter: `blur(${blur}px) brightness(${brightness})`,
+              transformOrigin: 'center center',
             }}
           >
             <SwipeCard
@@ -348,13 +364,24 @@ function CardStack({
               onSwipe={(dir: string) => handleSwipe(dir, repository, actualIndex)}
             >
               <div className={`w-full h-[calc(100vh-120px)] relative ${getHintClassName(actualIndex)}`}>
+                {/* Card shadow overlay for depth */}
+                {stackIndex > 0 && (
+                  <div
+                    className="absolute inset-0 bg-black rounded-xl pointer-events-none z-10"
+                    style={{
+                      opacity: stackIndex * 0.15,
+                      backdropFilter: `blur(${stackIndex}px)`
+                    }}
+                  />
+                )}
+
                 <RepositoryCard repository={repository} />
 
                 {/* Swipe Instruction Text - only on top card */}
                 {isTopCard && swipeHint.show && (
-                  <div className="absolute inset-x-0 bottom-8 flex justify-center pointer-events-none">
-                    <div className="bg-white/70 backdrop-blur px-4 py-2 rounded-full shadow-lg">
-                      <p className="text-center text-gray-700 text-sm">
+                  <div className="absolute inset-x-0 bottom-8 flex justify-center pointer-events-none z-20">
+                    <div className="bg-white/80 backdrop-blur-md px-6 py-3 rounded-full shadow-xl border border-white/20">
+                      <p className="text-center text-gray-700 text-sm font-medium">
                         Swipe card left or right
                       </p>
                     </div>
@@ -365,6 +392,11 @@ function CardStack({
           </div>
         );
       })}
+
+      {/* Background gradient for enhanced depth */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/5 rounded-xl" />
+      </div>
     </div>
   );
 }
