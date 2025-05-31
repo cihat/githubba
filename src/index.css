@@ -101,3 +101,26 @@
 .swipe-hint-right {
   animation: swipeRightHint 1s ease-in-out;
 }
+
+@keyframes heartbeat {
+  0% { transform: scale(1); }
+  25% { transform: scale(1.2); }
+  50% { transform: scale(1); }
+  75% { transform: scale(1.1); }
+  100% { transform: scale(1); }
+}
+
+.animate-bounce {
+  animation: bounce 0.8s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { 
+    transform: translateY(0) scale(1);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% { 
+    transform: translateY(-15px) scale(1.05);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}

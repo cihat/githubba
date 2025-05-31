@@ -28,8 +28,7 @@ const ANIMATION_SEQUENCE = [
   { direction: null, duration: 1000 }
 ];
 
-const ANIMATION_DURATION = 800; // Increased duration for better visibility
-const CARD_TRANSITION_DURATION = 400;
+const ANIMATION_DURATION = 800;
 
 export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }: RepositoryListProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -42,15 +41,13 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     direction: null,
     sequenceIndex: 0
   });
-  const [isTransitioning, setIsTransitioning] = useState(false);
   const [hasRequestedMore, setHasRequestedMore] = useState(false);
 
-  // Animation timer refs for cleanup
+  // Single timer ref for animation cleanup
   const animationTimerRef = useRef<number | null>(null);
-  const hintTimerRef = useRef<number | null>(null);
-  const transitionTimerRef = useRef<number | null>(null);
   const prevLengthRef = useRef(repositories.length);
 
+  // Swipe hint animation effect
   useEffect(() => {
     if (!swipeHint.show) return;
 
@@ -60,22 +57,9 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
       ...prev,
       direction: currentStep.direction as 'left' | 'right' | null
     }));
-
-    hintTimerRef.current = window.setTimeout(() => {
-      setSwipeHint(prev => ({
-        ...prev,
-        sequenceIndex: (prev.sequenceIndex + 1) % ANIMATION_SEQUENCE.length
-      }));
-    }, currentStep.duration);
-
-    return () => {
-      if (hintTimerRef.current) {
-        window.clearTimeout(hintTimerRef.current);
-        hintTimerRef.current = null;
-      }
-    };
   }, [swipeHint.show, swipeHint.sequenceIndex]);
 
+  // Load more repositories when needed
   useEffect(() => {
     const remainingCards = repositories.length - currentIndex;
     const shouldLoadMore = remainingCards <= 5 && !hasRequestedMore && onLoadMore;
@@ -86,6 +70,7 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     }
   }, [currentIndex, repositories.length, hasRequestedMore, onLoadMore]);
 
+  // Reset load more flag when new repositories are loaded
   useEffect(() => {
     if (repositories.length > prevLengthRef.current + 5) {
       setHasRequestedMore(false);
@@ -93,16 +78,11 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     prevLengthRef.current = repositories.length;
   }, [repositories.length]);
 
+  // Cleanup on unmount
   useEffect(() => {
     return () => {
       if (animationTimerRef.current) {
         window.clearTimeout(animationTimerRef.current);
-      }
-      if (hintTimerRef.current) {
-        window.clearTimeout(hintTimerRef.current);
-      }
-      if (transitionTimerRef.current) {
-        window.clearTimeout(transitionTimerRef.current);
       }
     };
   }, []);
@@ -121,20 +101,10 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
     }, ANIMATION_DURATION);
   }, []);
 
+  // Simplified card advancement without unnecessary setTimeout
   const advanceToNextCard = useCallback(() => {
     if (currentIndex >= repositories.length - 1) return;
-
-    setIsTransitioning(true);
-
-    transitionTimerRef.current = window.setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-
-      setTimeout(() => {
-        setIsTransitioning(false);
-      }, 100);
-
-      transitionTimerRef.current = null;
-    }, 200);
+    setCurrentIndex(prev => prev + 1);
   }, [currentIndex, repositories.length]);
 
   const handleSwipe = useCallback((direction: string, repository: Repository, index: number) => {
@@ -207,7 +177,6 @@ export function RepositoryStack({ repositories, scrollContainerRef, onLoadMore }
             swipeHint={swipeHint}
             handleSwipe={handleSwipe}
             getHintClassName={getHintClassName}
-            isTransitioning={isTransitioning}
           />
         </div>
       </div>
@@ -248,7 +217,7 @@ function AnimationOverlay({ animation }: AnimationOverlayProps) {
 
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-      {/* Background overlay with fade in/out */}
+      {/* Background overlay */}
       <div
         className="absolute inset-0 transition-opacity duration-300"
         style={{
@@ -312,32 +281,6 @@ function AnimationOverlay({ animation }: AnimationOverlayProps) {
           </div>
         </div>
       </div>
-
-      {/* Additional CSS for custom animations */}
-      <style jsx>{`
-        @keyframes heartbeat {
-          0% { transform: scale(1); }
-          25% { transform: scale(1.2); }
-          50% { transform: scale(1); }
-          75% { transform: scale(1.1); }
-          100% { transform: scale(1); }
-        }
-        
-        .animate-bounce {
-          animation: bounce 0.8s infinite;
-        }
-        
-        @keyframes bounce {
-          0%, 100% { 
-            transform: translateY(0) scale(1);
-            animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
-          }
-          50% { 
-            transform: translateY(-15px) scale(1.05);
-            animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
-          }
-        }
-      `}</style>
     </div>
   );
 }
@@ -388,7 +331,6 @@ interface CardStackProps {
   swipeHint: SwipeHintState;
   handleSwipe: (direction: string, repository: Repository, index: number) => void;
   getHintClassName: (index: number) => string;
-  isTransitioning: boolean;
 }
 
 const CardStack = memo(function CardStack({
@@ -396,12 +338,11 @@ const CardStack = memo(function CardStack({
   currentIndex,
   swipeHint,
   handleSwipe,
-  getHintClassName,
-  isTransitioning
+  getHintClassName
 }: CardStackProps) {
   console.log('aliveli');
-  return (
 
+  return (
     <div className="relative h-full flex items-center">
       {cards.map((repository, stackIndex) => {
         const actualIndex = currentIndex + stackIndex;
@@ -414,18 +355,14 @@ const CardStack = memo(function CardStack({
         const opacity = isTopCard ? 1 : Math.max(0.6, 1 - (stackIndex * 0.2));
         const brightness = isTopCard ? 1 : Math.max(0.75, 1 - (stackIndex * 0.12));
 
-        const transitionClass = isTransitioning && isTopCard
-          ? 'transition-all duration-500 ease-out'
-          : 'transition-all duration-700 ease-out';
-
         return (
           <div
             key={repository.id}
-            className={`absolute inset-0 flex items-center ${transitionClass}`}
+            className="absolute inset-0 flex items-center transition-all duration-700 ease-out"
             style={{
               zIndex,
               transform: `translateY(${yOffset}px) translateX(${xOffset}px) scale(${scale})`,
-              opacity: isTransitioning && isTopCard ? 0 : opacity,
+              opacity,
               filter: `blur(-1px) brightness(${brightness})`,
               transformOrigin: 'center center',
             }}
