@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { X, AlertCircle } from 'lucide-react';
-import { FeedType } from '../lib/github';
+import { FeedType } from '../types';
 
 const POPULAR_LANGUAGES = [
   'JavaScript',
@@ -27,8 +27,6 @@ const POPULAR_LANGUAGES = [
   'Lua',
   'Perl',
 ] as const;
-
-export type Language = (typeof POPULAR_LANGUAGES)[number] | null;
 
 interface SettingsPopupProps {
   onClose: () => void;

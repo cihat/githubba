@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
 
 import {
   CircleDot,
@@ -11,43 +9,7 @@ import {
   Clock,
 } from 'lucide-react';
 import { shortNumber } from '../lib/number';
-export type License = {
-  key: string;
-  name: string;
-  spdx_id: string;
-  url: string;
-  node_id: string;
-};
-
-export type Owner = {
-  login: string;
-  id: number;
-  avatar_url: string;
-  html_url: string;
-  type: string;
-  [key: string]: any;
-};
-
-export type Repository = {
-  id: number;
-  name: string;
-  full_name: string;
-  private: boolean;
-  owner: Owner;
-  html_url: string;
-  description: string;
-  fork: boolean;
-  created_at: string;
-  updated_at: string;
-  stargazers_count: number;
-  watchers_count: number;
-  language: string;
-  forks_count: number;
-  topics: string[];
-  license: License;
-  visibility: string;
-  [key: string]: any;
-};
+import type { Repository } from "../types";
 
 interface RepositoryCardProps {
   repository: Repository;
@@ -75,7 +37,7 @@ export function RepositoryCard({ repository }: RepositoryCardProps) {
   return (
     <div className='grid grid-rows-[minmax(0,1fr)_auto_auto] h-full gap-3 sm:gap-6 select-none'>
       {/* Main card - repository info */}
-      <div className='bg-white dark:bg-white/[0.03] bg-gray-100 rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] shadow-md sm:shadow-xl flex flex-col min-h-0 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors noselect'>
+      <div className='dark:bg-white/[0.03] rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 backdrop-blur-xl border border-gray-200 dark:border-white/[0.06] shadow-md sm:shadow-xl flex flex-col min-h-0 hover:bg-gray-50 dark:hover:bg-white/[0.04] transition-colors noselect'>
         {/* Repository header with owner avatar */}
         <a
           href={repository.html_url}

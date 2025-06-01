@@ -1,8 +1,9 @@
 import { RefObject, useEffect, useState, useCallback, useRef, useMemo, memo } from 'react';
-import { Repository, RepositoryCard } from './RepositoryCard';
+import { RepositoryCard } from './RepositoryCard';
 import SwipeCard from './SwipeCard';
 import { Heart, X, ChevronLeft, ChevronRight } from 'lucide-react';
 import { openLink } from '../lib/utils';
+import type { Repository } from '../types';
 
 interface RepositoryListProps {
   repositories: Repository[];

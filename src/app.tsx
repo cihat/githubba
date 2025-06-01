@@ -8,8 +8,8 @@ import { RepositoryStack } from './components/RepositoryStack';
 import { SettingsPopup } from './components/SettingsPopup';
 import { useGitHub } from './hooks/use-github';
 import { useOnlineStatus } from './hooks/use-online-status';
-import { FeedType } from './lib/github';
 import { Analytics } from '@vercel/analytics/react';
+import { FeedType } from './types';
 
 export function App() {
   const [showSettings, setShowSettings] = useState(false);

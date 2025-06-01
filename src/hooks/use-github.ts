@@ -1,15 +1,13 @@
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query';
 import { useCallback, useRef } from 'react';
-import { Repository } from '../components/RepositoryCard';
 import {
   fetchRepositoriesPage,
   MAX_PAGES,
   getSearchCriterias,
-  SearchCriteria,
-  FeedType,
 } from '../lib/github';
 import { InvalidTokenError, OnlyFirst1000ResultsError } from '../lib/errors';
 import { RateLimitExceededError } from '../lib/errors';
+import type { FeedType, Repository, SearchCriteria } from '../types';
 
 const SEEN_STORAGE_KEY = 'github_seen_repositories';
 
@@ -95,8 +93,8 @@ export function useGitHub(params: UseGitHubOptions = {}) {
         feedType === 'new'
           ? availableCriterias[0]
           : availableCriterias[
-              Math.floor(Math.random() * availableCriterias.length)
-            ];
+          Math.floor(Math.random() * availableCriterias.length)
+          ];
       const criteriaKey = JSON.stringify(criteria);
       const seenData = seen[criteriaKey];
 

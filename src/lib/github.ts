@@ -1,4 +1,4 @@
-import { Repository } from '../components/RepositoryCard';
+import type { FeedType, Repository, SearchCriteria } from '../types';
 import {
   InvalidTokenError,
   OnlyFirst1000ResultsError,
@@ -11,14 +11,6 @@ export interface SearchResponse {
   total_count: number;
   items: Repository[];
 }
-
-export type SearchCriteria = {
-  stars: string;
-  language?: string;
-  created?: string;
-};
-
-export type FeedType = 'random' | 'new';
 
 export const PER_PAGE = 10;
 export const MAX_PAGES = 100; // GitHub's 1000 result limit with 10 items per page

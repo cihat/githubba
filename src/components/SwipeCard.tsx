@@ -2,7 +2,7 @@
 // @ts-nocheck
 
 // Copyed from https://www.npmjs.com/package/react-tinder-card
-import  { useSpring, animated } from '@react-spring/web';
+import { useSpring, animated } from '@react-spring/web';
 import useWindowSize from '../hooks/use-window-size';
 import React, { ReactNode } from 'react';
 
@@ -112,7 +112,7 @@ const SwipeCard = React.forwardRef(
     settings.swipeThreshold = swipeThreshold
 
     React.useImperativeHandle(ref, () => ({
-      async swipe (dir = 'right') {
+      async swipe(dir = 'right') {
         if (onSwipe) onSwipe(dir)
         const power = 1.3
         const disturbance = (Math.random() - 0.5) / 2
@@ -127,7 +127,7 @@ const SwipeCard = React.forwardRef(
         }
         if (onCardLeftScreen) onCardLeftScreen(dir)
       },
-      async restoreCard () {
+      async restoreCard() {
         await animateBack(setSpringTarget)
       }
     }))
