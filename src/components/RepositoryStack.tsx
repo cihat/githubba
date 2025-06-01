@@ -384,7 +384,7 @@ const CardStack = memo(function CardStack({
                 )}
 
                 {isTopCard && (
-                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/30 rounded-xl pointer-events-none z-5" />
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white/15 dark:to-black/30 rounded-xl pointer-events-none z-5" />
                 )}
 
                 <RepositoryCard repository={repository} />
