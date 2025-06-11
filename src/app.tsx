@@ -10,8 +10,11 @@ import { useGitHub } from './hooks/use-github';
 import { useOnlineStatus } from './hooks/use-online-status';
 import { Analytics } from '@vercel/analytics/react';
 import { FeedType } from './types';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { PrivacyPolicy } from './pages/PrivacyPolicy';
+import { TermsAndConditions } from './pages/TermsAndConditions';
 
-export function App() {
+function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState<string>();
   const [selectedToken, setSelectedToken] = useState<string>();
@@ -116,8 +119,19 @@ export function App() {
           onLoadMore={handleLoadMore}
         />
       )}
-      
-      <Analytics />
     </div>
+  );
+}
+
+export function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+        <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+      </Routes>
+      <Analytics />
+    </BrowserRouter>
   );
 }
